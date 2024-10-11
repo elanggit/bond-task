@@ -1,6 +1,8 @@
 import axios from 'axios';
 import Player from '../models/playerModel';
 import dotenv from 'dotenv';
+import handleError from './errorHandler';
+
 
 dotenv.config();
 
@@ -9,6 +11,9 @@ const access_token = process.env.ACCESS_TOKEN;
 
 const getPlayers = async (req, res) => {
     try {
+        if (!access_token) {
+            throw new Error('Access token is not defined');
+        }
         const response = await axios.get(`${ball_dont_lie_host}/players`, {
             headers: {
               'Authorization': access_token
@@ -28,8 +33,7 @@ const getPlayers = async (req, res) => {
 
         res.json(players);
     } catch (error) {
-        console.error('Error fetching players data:', error);
-        res.status(500).json({ error: 'Failed to fetch players data' });
+        handleError(error, res);
     }
 };
 
