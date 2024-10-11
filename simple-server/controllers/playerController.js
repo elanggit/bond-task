@@ -3,24 +3,28 @@ import Player from '../models/playerModel';
 import dotenv from 'dotenv';
 import handleError from './errorHandler';
 
-
 dotenv.config();
 
 const ball_dont_lie_host = 'https://api.balldontlie.io/v1/'
-const access_token = process.env.ACCESS_TOKEN;
+const access_token = '28e05f4b-1159-4fde-b847-7d22820bd616';
 
 const getPlayers = async (req, res) => {
     try {
         if (!access_token) {
-            throw new Error('Access token is not defined');
+            return res.status(500).send('No authorization token found');
         }
+
+        const { page = 1, limit = 10 } = req.query;
+
         const response = await axios.get(`${ball_dont_lie_host}/players`, {
             headers: {
               'Authorization': access_token
+            },
+            params: {
+                per_page: limit
             }
           });
         const players = response.data.data.map(playerData => {
-            console.log('response', playerData.team.full_name)
             return new Player({
                 first_name: playerData.first_name,
                 last_name: playerData.last_name,
@@ -30,8 +34,15 @@ const getPlayers = async (req, res) => {
                 team_name: playerData.team.full_name
             });
         });
+        const meta = response.data.meta
+        let total_pages = Math.ceil(meta.total_count / limit);
+        const next_cursor = meta.next_cursor;
 
-        res.json(players);
+        res.json({
+            players: players,
+            total_pages: total_pages,
+            next_cursor: next_cursor
+        });
     } catch (error) {
         handleError(error, res);
     }
