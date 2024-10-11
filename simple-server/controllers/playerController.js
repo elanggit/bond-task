@@ -7,8 +7,8 @@ import NodeCache from 'node-cache';
 
 dotenv.config();
 
-const ball_dont_lie_host = 'https://api.balldontlie.io/v1/'
-const access_token = '28e05f4b-1159-4fde-b847-7d22820bd616';
+const ball_dont_lie_player_endpoint = 'https://api.balldontlie.io/v1/players'
+const access_token = process.env.ACCESS_TOKEN;
 
 // ten minute cache
 const cache = new NodeCache({ stdTTL: 600 });
@@ -29,7 +29,7 @@ const getPlayers = async (req, res) => {
 
         const { page = 1, limit = 5 } = req.query;
         const response = await getPlayerResponse({ per_page: limit});
-        const players =  getPlayerData(response.data.data);
+        const players = getPlayerData(response.data.data);
         const meta = response.data.meta
         const total_pages = Math.ceil(meta.total_count / limit);
 
@@ -84,7 +84,7 @@ const getFavoritePlayers = async (req, res) => {
 };
 
 const getPlayerResponse = async (params) => {
-    return await axios.get(`${ball_dont_lie_host}/players`, {
+    return await axios.get(ball_dont_lie_player_endpoint, {
         headers: headers,
         params: params
     });
