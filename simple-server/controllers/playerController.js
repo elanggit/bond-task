@@ -12,30 +12,35 @@ const access_token = '28e05f4b-1159-4fde-b847-7d22820bd616';
 
 // ten minute cache
 const cache = new NodeCache({ stdTTL: 600 });
+
 const headers = { 'Authorization': access_token }
+
 const getPlayers = async (req, res) => {
     try {
         const cacheKey = `players_${page}_${limit}`;
         const cachedData = cache.get(cacheKey);
-        // if (cachedData) {
-        //     return res.json(cachedData);
-        // }
-        if (!access_token) {
+        if (!access_token ) {
             return res.status(500).send('No authorization token found');
+        }
+
+        if (cachedData) {
+            return res.json(cachedData);
         }
 
         const { page = 1, limit = 5 } = req.query;
         const response = await getPlayerResponse({ per_page: limit});
-        const players = await getPlayerData(response.data.data);
+        const players =  getPlayerData(response.data.data);
         const meta = response.data.meta
         const total_pages = Math.ceil(meta.total_count / limit);
         const next_cursor = meta.next_cursor;
-        cache.set(cacheKey, response.data);
-        res.json({
+
+        const responseData = {
             players: players,
             total_pages: total_pages,
             next_cursor: next_cursor
-        });
+        };
+        cache.set(cacheKey, responseData);
+        res.json(responseData);
     } catch (error) {
         handleError(error, res);
     }
