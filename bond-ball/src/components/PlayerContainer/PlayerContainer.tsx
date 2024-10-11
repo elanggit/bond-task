@@ -32,8 +32,22 @@ const PlayerContainer: React.FC = () => {
                 setError({ message: 'OOPS! Something went wrong' });
             }
             };
+
+            const fetchFavoritePlayers = async () => {
+                try {
+                    const response = await axios.get('http://localhost:3001/api/players/getFavorites', {
+                        params: {
+                            user_id: 1
+                        }
+                    });
+                    setFavoritedPlayers(response.data.players);
+                } catch (error) {
+                    setError({ message: 'OOPS! Something went wrong' });
+                }
+                };
     
             fetchPlayers();
+            fetchFavoritePlayers();
         }, [page, playersPerPage]);
 
     if (error) {
