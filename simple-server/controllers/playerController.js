@@ -6,7 +6,7 @@ import handleError from './errorHandler';
 dotenv.config();
 
 const ball_dont_lie_host = 'https://api.balldontlie.io/v1/'
-const access_token = '28e05f4b-1159-4fde-b847-7d22820bd616';
+const access_token = process.env.ACCESS_TOKEN;
 
 const getPlayers = async (req, res) => {
     try {

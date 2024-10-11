@@ -4,6 +4,7 @@ import StarTwoToneIcon from '@mui/icons-material/StarTwoTone';
 import './PlayerCardContainer.css';
 
 interface PlayerCardContainerProps {
+    id: string;
     key: string;
     first_name: string;
     last_name: string;
