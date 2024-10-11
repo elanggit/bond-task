@@ -32,12 +32,11 @@ const getPlayers = async (req, res) => {
         const players =  getPlayerData(response.data.data);
         const meta = response.data.meta
         const total_pages = Math.ceil(meta.total_count / limit);
-        const next_cursor = meta.next_cursor;
 
         const responseData = {
             players: players,
             total_pages: total_pages,
-            next_cursor: next_cursor
+            next_cursor: meta.next_cursor
         };
         cache.set(cacheKey, responseData);
         res.json(responseData);
