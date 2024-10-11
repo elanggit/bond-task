@@ -6,6 +6,10 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 In the project directory, you can run:
 
+CREATE ROLE dev_user WITH LOGIN PASSWORD 'dev_password';
+CREATE DATABASE nba_players OWNER dev_user;
+GRANT ALL PRIVILEGES ON DATABASE nba_players TO dev_user;
+
 ### `npm start`
 
 Runs the app in the development mode.\
