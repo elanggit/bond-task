@@ -1,125 +1,179 @@
+import React, { useState, useMemo, useEffect } from 'react';
 
-import React, { useState, useEffect } from 'react';
-import { Typography, Box, Grid2, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
-import Pagination from '@mui/material/Pagination';
+import Box from '@mui/joy/Box';
+import Card from '@mui/joy/Card';
+import Chip from '@mui/joy/Chip';
+import Typography from '@mui/joy/Typography';
 
-import axios from 'axios';
+import Pagination from "@mui/material/Pagination";
 import './PlayerContainer.css';
-import PlayerCardContainer from '../PlayerCardContainer/PlayerCardContainer.tsx';
-import ErrorComponent from '../errors/ErrorComponent.tsx';
-const results_per_page = [5,15,25,50,100];
+import { useFetch } from '../../hooks/useFetch.tsx';
+import  NoFavoritePlayers from '../NoFavoritePlayers/NoFavoritePlayers.tsx';
+import Player from "../../types/Players.ts";
+import PlayerCardContainer from "../PlayerCardContainer/PlayerCardContainer.tsx";
+import ErrorComponent from "../errors/ErrorComponent.tsx";
+import FavoritePlayersHeader from '../FavoritePlayerHeaders.tsx';
+import ResultsPerPage from '../ResultsPerPage/ResultsPerPage.tsx';
+import Input from '@mui/joy/Input';
+import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from "@mui/icons-material/Clear";
+import {
+  FormControl,
+  InputAdornment
+} from "@material-ui/core";
+
+import { SelectChangeEvent } from '@mui/material';
+const RESULTS_PER_PAGE = [5, 15, 25, 50, 100];
+const PLAYER_API_URL = "http://localhost:3001/api/players";
+const FAVORITE_PLAYER_API_URL = "http://localhost:3001/api/players/getFavorites";
+
 const PlayerContainer: React.FC = () => {
-    const [players, setPlayers] = useState([]);
-    const [favoritedPlayers, setFavoritedPlayers] = useState<string[]>([]);
-    const [error, setError] = useState<{ message: string } | null>(null);
+    const [players, setPlayers] = useState<Player[]>([]);
+    const [favoritedPlayers, setFavoritedPlayers] = useState<Player[]>([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [nextCursor, setNextCursor] = useState(1);
-    const [playersPerPage, setPlayersPerPage] = useState(10);
+    const [playersPerPage, setPlayersPerPage] = useState(5);
+    const [showClearIcon, setShowClearIcon] = useState("none");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const player_options = useMemo(() => ({
+        params: {
+            limit: playersPerPage,
+            page,
+            search: searchTerm,
+        },
+    }), [playersPerPage, page, searchTerm]);
+
+    const { data: playerData, error: playerError, loading: playerLoading } = useFetch<{
+        players: Player[];
+        totalPages: number;
+        nextCursor: number;
+    }>(PLAYER_API_URL, player_options);
+
+    const favorite_player_options = useMemo(() => ({
+      params: {
+        user_id: 1 
+      },
+  }), []);
+
+    const { data: favoriteData, error: favoriteError, loading: favoriteLoading } = useFetch<{
+      players: Player[];
+      totalPages: number;
+      nextCursor: number;
+    }>(FAVORITE_PLAYER_API_URL, favorite_player_options);
 
     useEffect(() => {
-        const fetchPlayers = async () => {
-            try {
-                const response = await axios.get('http://localhost:3001/api/players', {
-                    params: {
-                        limit: playersPerPage
-                    }
-                });
-                setPlayers(response.data.players);
-                setTotalPages(response.data.totalPages);
-                setNextCursor(response.data.nextCursor);
-            } catch (error) {
-                setError({ message: 'OOPS! Something went wrong' });
-            }
-            };
-
-            const fetchFavoritePlayers = async () => {
-                try {
-                    const response = await axios.get('http://localhost:3001/api/players/getFavorites', {
-                        params: {
-                            user_id: 1
-                        }
-                    });
-                    setFavoritedPlayers(response.data.players);
-                } catch (error) {
-                    setError({ message: 'OOPS! Something went wrong' });
-                }
-                };
-    
-            fetchPlayers();
-            fetchFavoritePlayers();
-        }, [page, playersPerPage]);
-
-    if (error) {
-        return <ErrorComponent message={error.message} />;
+      if (playerData) {
+        setPlayers(playerData.players);
+        setTotalPages(playerData.totalPages);
+        setNextCursor(playerData.nextCursor);
+      }
+      if (favoriteData) {
+        setFavoritedPlayers(favoriteData.players);
+      }
+  }, [playerData, favoriteData]);
+  
+    if (playerLoading) {
+      return <Typography>Loading...</Typography>;
     }
-
-    const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
-        setPage(value);
+   
+    if (playerError) {
+      return <ErrorComponent message={playerError} />;
+    }
+   
+    const handlePageChange = (
+      event: React.ChangeEvent<HTMLInputElement>,
+      value: number
+    ) => {
+      setPage(parseInt(event.target.value));
+    };
+   
+    const handlePlayersPerPageChange = (
+      event: SelectChangeEvent<number>
+    ) => {
+      setPlayersPerPage(parseInt(event.target.value as string));      
+      setPage(1);
     };
 
-    const handlePlayersPerPageChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        setPlayersPerPage(event.target.value as number);
-        setPage(1); 
+    const handleCreateSearchTerm = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchQuery(event.target.value);
+    };
+  
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === "Enter") {
+        // Perform search logic here using 'searchTerm'
+        console.log(searchQuery);
+        setSearchTerm(searchQuery);
+      }
     };
 
+   
     return (
-        <div style={{ paddingTop: '20px' }}>
-            <Typography variant="h4" className="heading">
-                Players
-            </Typography>
-            <FormControl variant="outlined" style={{ minWidth: 120, marginBottom: '20px' }}>
-                <InputLabel id="players-per-page-label">Results per page</InputLabel>
-                <Select
-                    labelId="players-per-page-label"
-                    value={playersPerPage}
-                    onChange={handlePlayersPerPageChange}
-                    label="Results per page"
-                >
-                    {results_per_page.map((option: any) =>(
-                      <MenuItem value={option}> {option} </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-            <Grid2 container spacing={2}>
-                {players.map((player: any) => (
-                    <Grid2 item key={player.id} xs={12} sm={6} md={4}>
-                        <PlayerCardContainer
-                            first_name={player.first_name}
-                            last_name={player.last_name}
-                            team_name={player.team_name}
-                        />
-                    </Grid2>
-                ))}
-            </Grid2>
-            <Pagination
-                count={totalPages}
-                page={page}
-                onChange={handlePageChange}
-                color="primary"
-                style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}
+      <>
+        <Box
+          sx={{
+            width: '100%',
+            height: '70%',
+            display: 'flex',
+            flexDirection: 'row',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
+            gap: 4,
+          }}
+        >
+          <Card width='20%' height='70%' size="lg" variant="outlined">
+            <Chip size="sm" variant="outlined" color="neutral">
+              Players
+            </Chip>
+            {/* <Input placeholder="Search for players…" /> */}
+            <FormControl>
+            <Input
+              size="small"
+              variant="outlined"
+              onChange={handleCreateSearchTerm}
+              onKeyDown={handleKeyDown}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  // <InputAdornment
+                  //   position="end"
+                  //   style={{ display: showClearIcon }}
+                  //   onClick={handleClick}
+                  // >
+                    <ClearIcon />
+                  // </InputAdornment>
+                )
+              }}
             />
-            <Typography variant="h4" className="heading">
-                Favorite Players
-            </Typography>
+          </FormControl>
+            <ResultsPerPage
+              playersPerPage={playersPerPage}
+              handlePlayersPerPageChange={handlePlayersPerPageChange}
+              options={RESULTS_PER_PAGE}
+            />
+            {players && players.length > 0 && <PlayerCardContainer players={players} />}
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={handlePageChange}
+            />
+          </Card>
+          <Card width='20%' height='70%' size="lg" variant="outlined">
+            <FavoritePlayersHeader/>
             {favoritedPlayers && favoritedPlayers.length > 0 ? (
-                favoritedPlayers.map((player) => (
-                    player && (
-                        <PlayerCardContainer
-                            key={`${player.first_name}-${player.last_name}`}
-                            first_name={player.first_name}
-                            last_name={player.last_name}
-                            team_name={player.team_name}
-                        />
-                    )
-                ))
+              <PlayerCardContainer players={favoritedPlayers} />
             ) : (
-                <Typography variant="body1" className="no-favorites">
-                    No favorite players yet. Click on the star icon to add a player to your favorites.
-                </Typography>
+              <NoFavoritePlayers />
             )}
-        </div>
+            </Card>
+        </Box>
+      </>
     );
-};
+  };
 
 export default PlayerContainer;
