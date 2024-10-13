@@ -17,7 +17,7 @@ interface PlayerCardProps {
 }
 
 const PlayerCard: React.FC<PlayerCardProps> = ({ player, isFavorited, onFavoriteClick }) => {
-const { id, first_name, last_name, team_name, position, height, weight } = player;
+const { first_name, last_name, team_name, position, height, weight } = player;
 
 const handleFavoriteClick = () => {
     onFavoriteClick(player);
@@ -37,7 +37,7 @@ const handleFavoriteClick = () => {
        >
          <Box className="favorite-icon-container" onClick={handleFavoriteClick}>
            <StarTwoToneIcon
-             color={isFavorited ? 'warning' : 'grey'}
+             color={isFavorited ? 'success' : 'disabled'}
              className={`favorite-icon ${
                isFavorited ? "favorited" : "not-favorited"
              }`}
@@ -55,6 +55,5 @@ const handleFavoriteClick = () => {
    </Card>
  );
 };
-
 
 export default PlayerCard;
