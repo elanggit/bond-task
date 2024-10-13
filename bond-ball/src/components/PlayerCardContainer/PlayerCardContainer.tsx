@@ -5,7 +5,6 @@ import "./PlayerCardContainer.css";
 import PlayerCard from "../PlayerCard/PlayerCard.tsx";
 import Player from "../../types/Players";
 
-
 interface PlayerCardContainerProps {
   players: Player[];
   favoritedPlayers: Player[];
@@ -20,14 +19,14 @@ const PlayerCardContainer: React.FC<PlayerCardContainerProps> = ({
  return (
   <Box
      sx={{ 
-        display: 'flex', 
-        flexDirection: 'column',
-        flexWrap: 'wrap', 
-        maxHeight: '500px', 
-        overflowY: 'scroll'
+      display: 'flex', 
+      flexDirection: 'column',
+      flexWrap: 'wrap', 
+      maxHeight: '500px', 
+      overflowY: 'scroll'
     }}
    >
-     {players && players.map((player, index) => (
+      {players && players.map((player, index) => (
         <PlayerCard 
         key={index}
         player={player}

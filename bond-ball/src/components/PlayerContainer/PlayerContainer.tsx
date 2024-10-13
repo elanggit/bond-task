@@ -5,7 +5,7 @@ import Card from '@mui/joy/Card';
 import Chip from '@mui/joy/Chip';
 import Typography from '@mui/joy/Typography';
 
-import axios, { AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 
 import Pagination from "@mui/material/Pagination";
 import './PlayerContainer.css';
@@ -17,14 +17,9 @@ import ErrorComponent from "../errors/ErrorComponent.tsx";
 import FavoritePlayersHeader from '../FavoritePlayerHeaders.tsx';
 import ResultsPerPage from '../ResultsPerPage/ResultsPerPage.tsx';
 import Input from '@mui/joy/Input';
-import SearchIcon from '@mui/icons-material/Search';
-import ClearIcon from "@mui/icons-material/Clear";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import {
-  FormControl,
-  InputAdornment
-} from "@material-ui/core";
+import { FormControl } from "@material-ui/core";
 
 import { PaginationItem, SelectChangeEvent } from '@mui/material';
 import { PLAYER_API_URL, FAVORITE_PLAYER_API_URL } from '../../constants/apiUrls.ts';
@@ -142,11 +137,10 @@ const PlayerContainer: React.FC = () => {
             gap: 4,
           }}
         >
-          <Card width='20%' height='90%' size="lg" variant="outlined">
+          <Card sx={{ width: '80%', height: '100%' }} size="lg" variant="outlined">
             <Chip size="sm" variant="outlined" color="neutral">
               Players
             </Chip>
-            {/* <Input placeholder="Search for players…" /> */}
             <FormControl>
             <Input
             placeholder="Search for players by first or last name"
@@ -173,16 +167,16 @@ const PlayerContainer: React.FC = () => {
                 size="small"
                 renderItem={(item) => ( 
                     <PaginationItem 
-                        slots={{ 
-                            previous: ArrowBackIcon, 
-                            next: ArrowForwardIcon 
-                        }} 
-                        {...item} 
+                      slots={{ 
+                          previous: ArrowBackIcon, 
+                          next: ArrowForwardIcon 
+                      }} 
+                      {...item} 
                     /> 
                 )} 
             /> 
           </Card>
-          <Card width='20%' height='70%' size="lg" variant="outlined">
+          <Card sx={{ width: '20%', height: '70%' }} size="lg" variant="outlined">
             <FavoritePlayersHeader/>
             {favoritedPlayers && favoritedPlayers.length > 0 ? (
               <PlayerCardContainer
