@@ -1,7 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 
-import playerController from '../controllers/playerController';
+import playerController from '../controllers/player';
 
 const router = express.Router();
 

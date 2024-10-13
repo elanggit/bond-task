@@ -5,7 +5,7 @@ import PlayerContainer from '../src/components/PlayerContainer/PlayerContainer.t
 function App() {
   return (
     <div className="App">
-       <CssBaseline />
+      <CssBaseline />
       <PlayerContainer />
     </div>
   );

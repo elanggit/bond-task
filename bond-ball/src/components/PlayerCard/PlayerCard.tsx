@@ -1,59 +1,53 @@
-import React, { useState } from "react";
-import StarTwoToneIcon from "@mui/icons-material/StarTwoTone";
-import Player from "../../types/Players";
-import Box from '@mui/joy/Box';
+import React from 'react';
+import Player from '../../types/Players';
 import Card from '@mui/joy/Card';
-import Tooltip from '@mui/joy/Tooltip';
 import CardActions from '@mui/joy/CardActions';
 import Chip from '@mui/joy/Chip';
 import Divider from '@mui/joy/Divider';
+import CardContent from '@mui/joy/CardOverflow';
 
 import Typography from '@mui/joy/Typography';
+import FavoriteIcon from '../FavoriteIcon.tsx';
 
 interface PlayerCardProps {
   player: Player;
   isFavorited: boolean;
-  onFavoriteClick: ( player: Player) => void;
+  onFavoriteClick: (player: Player) => void;
 }
 
-const PlayerCard: React.FC<PlayerCardProps> = ({ player, isFavorited, onFavoriteClick }) => {
-const { first_name, last_name, team_name, position, height, weight } = player;
+const PlayerCard: React.FC<PlayerCardProps> = ({
+  player,
+  isFavorited,
+  onFavoriteClick,
+}) => {
+  const { first_name, last_name, team_name, position, height, weight } = player;
 
-const handleFavoriteClick = () => {
+  const handleFavoriteClick = () => {
     onFavoriteClick(player);
   };
 
- return (
-   <Card size="lg" variant="outlined" className="card">
-     <CardActions>
-          <Typography level="title-lg" sx={{ mr: 'auto' }}>
-            {first_name} { last_name}
-          </Typography>
-          <Tooltip color='primary'
-         title={`Click to ${isFavorited ? "remove" : "add"} this player ${
-           isFavorited ? "from" : "to"
-         } your favorites.`}
-         arrow
-       >
-         <Box className="favorite-icon-container" onClick={handleFavoriteClick}>
-           <StarTwoToneIcon
-             color={isFavorited ? 'success' : 'disabled'}
-             className={`favorite-icon ${
-               isFavorited ? "favorited" : "not-favorited"
-             }`}
-           />
-         </Box>
-       </Tooltip>
-        </CardActions>
-       <Chip size="sm" variant="outlined" color="neutral">
-         {team_name}
-        </Chip>
-        <Divider inset="none" />
+  return (
+    <Card sx={{ width: '350px' }} size="lg" variant="outlined" className="card">
+      <CardActions>
+        <Typography level="title-lg" sx={{ mr: 'auto' }}>
+          {first_name} {last_name}
+        </Typography>
+        <FavoriteIcon
+          isFavorited={isFavorited}
+          handleFavoriteClick={handleFavoriteClick}
+        />
+      </CardActions>
+      <Chip size="md" variant="outlined" color="neutral">
+        {team_name}
+      </Chip>
+      <Divider inset="none" />
+      <CardContent sx={{ alignItems: 'center', textAlign: 'center', gap: 2 }}>
         <Typography> Position: {position} </Typography>
         <Typography> Height: {height} </Typography>
         <Typography> Weight: {weight} </Typography>
-   </Card>
- );
+      </CardContent>
+    </Card>
+  );
 };
 
 export default PlayerCard;

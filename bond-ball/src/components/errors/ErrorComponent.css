@@ -1,24 +1,24 @@
 /* ErrorComponent.css */
 
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f8f9fa;
-    font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f8f9fa;
+  font-family: Arial, sans-serif;
 }
 
 .error-container {
-    text-align: center;
+  text-align: center;
 }
 
 .error-message {
-    font-size: 24px;
-    margin-bottom: 20px;
+  font-size: 24px;
+  margin-bottom: 20px;
 }
 
 .error-image {
-    width: 200px;
-    height: auto;
+  width: 200px;
+  height: auto;
 }
