@@ -1,16 +1,15 @@
 import axios from 'axios';
-import pool from '../db/db';
-import Player from '../models/player';
 import User from '../models/user';
 import dotenv from 'dotenv';
 import handleError from '../errorHandler';
 import NodeCache from 'node-cache';
+const { formatPlayerData } = require('../services/playerService');
+
 
 dotenv.config();
 
 const ball_dont_lie_player_endpoint = 'https://api.balldontlie.io/v1/players'
 const access_token = process.env.ACCESS_TOKEN;
-const { formatPlayerData } = require('../services/playerService');
 
 // thirty minute cache. It is unlikely that the data will change in that time.
 const cache = new NodeCache({ stdTTL: 3000 });
