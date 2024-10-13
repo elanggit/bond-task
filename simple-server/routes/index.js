@@ -1,11 +1,14 @@
 import express from 'express';
+import bodyParser from 'body-parser';
+
 import playerController from '../controllers/playerController';
 
 const router = express.Router();
 
 router.get('/', playerController.getPlayers);
 
-router.get('/getFavorites', playerController.getFavoritePlayers);
-// router.post('/', playerController.addFavoritePlayer);
-// router.post('/', playerController.removeFavoritePlayer);
+router.get('/favorites', playerController.getFavorites);
+router.post('/addFavorite', playerController.addFavorite);
+router.post('/removeFavorite', playerController.removeFavorite);
+
 module.exports = router;

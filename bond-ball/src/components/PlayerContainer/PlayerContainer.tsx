@@ -5,6 +5,8 @@ import Card from '@mui/joy/Card';
 import Chip from '@mui/joy/Chip';
 import Typography from '@mui/joy/Typography';
 
+import axios, { AxiosRequestConfig } from 'axios';
+
 import Pagination from "@mui/material/Pagination";
 import './PlayerContainer.css';
 import { useFetch } from '../../hooks/useFetch.tsx';
@@ -17,39 +19,40 @@ import ResultsPerPage from '../ResultsPerPage/ResultsPerPage.tsx';
 import Input from '@mui/joy/Input';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from "@mui/icons-material/Clear";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import {
   FormControl,
   InputAdornment
 } from "@material-ui/core";
 
-import { SelectChangeEvent } from '@mui/material';
+import { PaginationItem, SelectChangeEvent } from '@mui/material';
+import { PLAYER_API_URL, FAVORITE_PLAYER_API_URL } from '../../constants/apiUrls.ts';
 const RESULTS_PER_PAGE = [5, 15, 25, 50, 100];
-const PLAYER_API_URL = "http://localhost:3001/api/players";
-const FAVORITE_PLAYER_API_URL = "http://localhost:3001/api/players/getFavorites";
 
 const PlayerContainer: React.FC = () => {
-    const [players, setPlayers] = useState<Player[]>([]);
-    const [favoritedPlayers, setFavoritedPlayers] = useState<Player[]>([]);
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [nextCursor, setNextCursor] = useState(1);
-    const [playersPerPage, setPlayersPerPage] = useState(5);
-    const [showClearIcon, setShowClearIcon] = useState("none");
-    const [searchQuery, setSearchQuery] = useState("");
-    const [searchTerm, setSearchTerm] = useState("");
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [favoritedPlayers, setFavoritedPlayers] = useState<Player[]>([]);
+  const [page, setPage] = useState(1);
+  const [nextCursor, setNextCursor] = useState(1);
+  const [queryWithNextCursor, setQueryWithNextCursor] = useState(false);
+  const [playersPerPage, setPlayersPerPage] = useState(5);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const player_options = useMemo(() => {
+    const params: { limit: number; page: number; search?: string, cursor?: number } = {
+      limit: playersPerPage,
+      page,
+    };
+    if (searchTerm.length > 1) { params.search = searchTerm;}
+    if (nextCursor && queryWithNextCursor) params.cursor = nextCursor;
 
-    const player_options = useMemo(() => ({
-        params: {
-            limit: playersPerPage,
-            page,
-            search: searchTerm,
-        },
-    }), [playersPerPage, page, searchTerm]);
+    return { params };
+    }, [playersPerPage, page, searchTerm]);
 
     const { data: playerData, error: playerError, loading: playerLoading } = useFetch<{
-        players: Player[];
-        totalPages: number;
-        nextCursor: number;
+      players: Player[];
+      nextCursor: number;
     }>(PLAYER_API_URL, player_options);
 
     const favorite_player_options = useMemo(() => ({
@@ -60,14 +63,12 @@ const PlayerContainer: React.FC = () => {
 
     const { data: favoriteData, error: favoriteError, loading: favoriteLoading } = useFetch<{
       players: Player[];
-      totalPages: number;
       nextCursor: number;
     }>(FAVORITE_PLAYER_API_URL, favorite_player_options);
 
     useEffect(() => {
       if (playerData) {
         setPlayers(playerData.players);
-        setTotalPages(playerData.totalPages);
         setNextCursor(playerData.nextCursor);
       }
       if (favoriteData) {
@@ -84,10 +85,12 @@ const PlayerContainer: React.FC = () => {
     }
    
     const handlePageChange = (
-      event: React.ChangeEvent<HTMLInputElement>,
+      event: React.ChangeEvent<unknown>,
       value: number
     ) => {
-      setPage(parseInt(event.target.value));
+      setPage(value);
+      setNextCursor(value);
+      setQueryWithNextCursor(true);
     };
    
     const handlePlayersPerPageChange = (
@@ -103,52 +106,54 @@ const PlayerContainer: React.FC = () => {
   
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === "Enter") {
-        // Perform search logic here using 'searchTerm'
-        console.log(searchQuery);
-        setSearchTerm(searchQuery);
+        setSearchTerm(searchQuery.toLowerCase());
       }
     };
 
+    const handleFavoritePlayer = async (player: Player) => {
+      setFavoritedPlayers((prevFavoritedPlayers) => {
+        if (prevFavoritedPlayers.some(favPlayer => favPlayer.id === player.id)) {
+          return prevFavoritedPlayers.filter(favPlayer => favPlayer.id !== player.id);
+        } else {
+          return [...prevFavoritedPlayers, player];
+        }
+      });
+  
+      try {
+        const body = { player_id: player.id, user_id: 1 };
+        const playerFavorited = favoritedPlayers.some(favPlayer => favPlayer.id === player.id);
+        const url_suffix = playerFavorited ? '/removeFavorite' : '/addFavorite';
+
+        await axios.post(`${PLAYER_API_URL}${url_suffix}`, body);
+      } catch (error) {
+        console.error('Error updating favorite player:', error);
+      };
+    };
    
     return (
       <>
         <Box
           sx={{
             width: '100%',
-            height: '70%',
+            height: '100%',
             display: 'flex',
             flexDirection: 'row',
             gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
             gap: 4,
           }}
         >
-          <Card width='20%' height='70%' size="lg" variant="outlined">
+          <Card width='20%' height='90%' size="lg" variant="outlined">
             <Chip size="sm" variant="outlined" color="neutral">
               Players
             </Chip>
             {/* <Input placeholder="Search for players…" /> */}
             <FormControl>
             <Input
-              size="small"
+            placeholder="Search for players by first or last name"
+              size="sm"
               variant="outlined"
               onChange={handleCreateSearchTerm}
               onKeyDown={handleKeyDown}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  // <InputAdornment
-                  //   position="end"
-                  //   style={{ display: showClearIcon }}
-                  //   onClick={handleClick}
-                  // >
-                    <ClearIcon />
-                  // </InputAdornment>
-                )
-              }}
             />
           </FormControl>
             <ResultsPerPage
@@ -156,17 +161,35 @@ const PlayerContainer: React.FC = () => {
               handlePlayersPerPageChange={handlePlayersPerPageChange}
               options={RESULTS_PER_PAGE}
             />
-            {players && players.length > 0 && <PlayerCardContainer players={players} />}
-            <Pagination
-              count={totalPages}
-              page={page}
-              onChange={handlePageChange}
-            />
+            {players && players.length > 0 && 
+            <
+              PlayerCardContainer players={players}
+              favoritedPlayers={favoritedPlayers}
+              onFavoriteClick={handleFavoritePlayer}
+              />}
+             <Pagination 
+                onChange={handlePageChange}
+                count={100} 
+                size="small"
+                renderItem={(item) => ( 
+                    <PaginationItem 
+                        slots={{ 
+                            previous: ArrowBackIcon, 
+                            next: ArrowForwardIcon 
+                        }} 
+                        {...item} 
+                    /> 
+                )} 
+            /> 
           </Card>
           <Card width='20%' height='70%' size="lg" variant="outlined">
             <FavoritePlayersHeader/>
             {favoritedPlayers && favoritedPlayers.length > 0 ? (
-              <PlayerCardContainer players={favoritedPlayers} />
+              <PlayerCardContainer
+                players={favoritedPlayers}
+                favoritedPlayers={favoritedPlayers}
+                onFavoriteClick={handleFavoritePlayer}
+            />
             ) : (
               <NoFavoritePlayers />
             )}

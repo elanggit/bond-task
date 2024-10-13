@@ -8,11 +8,14 @@ import Player from "../../types/Players";
 
 interface PlayerCardContainerProps {
   players: Player[];
+  favoritedPlayers: Player[];
+  onFavoriteClick: (player: Player) => void;
 }
-
 
 const PlayerCardContainer: React.FC<PlayerCardContainerProps> = ({
   players,
+  favoritedPlayers,
+  onFavoriteClick
 }) => {
  return (
   <Box
@@ -24,7 +27,13 @@ const PlayerCardContainer: React.FC<PlayerCardContainerProps> = ({
         overflowY: 'scroll'
     }}
    >
-     {players && players.map((player, index) => <PlayerCard key={index} player={player} />)}
+     {players && players.map((player, index) => (
+        <PlayerCard 
+        key={index}
+        player={player}
+        isFavorited={favoritedPlayers.includes(player)}
+        onFavoriteClick={onFavoriteClick}/>
+    ))};
    </Box>
  );
 };
