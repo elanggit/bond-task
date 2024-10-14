@@ -56,10 +56,10 @@ const handleSuccess = ( response, message) => {
 
 const updateFavoritePlayers = async (req, res, action) => {
   if (!access_token ) return handleMissingToken(res);
-  const { user_id, player_id } = req.body;
-  const user = new User(user_id);
+  const { userId, playerId } = req.body;
+  const user = new User(userId);
   try {
-    const updatedFavoritePlayers = action == 'add'? await user.addFavoritePlayer(player_id): await user.removeFavoritePlayer(player_id);
+    const updatedFavoritePlayers = action == 'add'? await user.addFavoritePlayer(playerId): await user.removeFavoritePlayer(playerId);
     const message = `Player ${action == 'add'? 'added': 'remove'} from favorites successfully`;
     handleSuccess(updatedFavoritePlayers, message);
     } catch (error) {
@@ -76,11 +76,11 @@ const removeFavorite = async (req, res) => {
 };
 
 const getFavorites = async (req, res) => {
-  const { user_id } = req.query;
-  const user = new User(user_id);
+  const { userId } = req.query;
+  const user = new User(userId);
   try {
-    const player_ids = await user.getFavoritePlayerIds();
-    const response = await getPlayerResponse({ 'player_ids[]': player_ids });
+    const playerIds = await user.getFavoritePlayerIds();
+    const response = await getPlayerResponse({ 'playerIds[]': playerIds });
     const formatted_player = formatPlayerData(response.data.data);
     handleSuccess(formatted_player, 'Favorite players fetched successfully');
   } catch (error) {

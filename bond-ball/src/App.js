@@ -1,6 +1,6 @@
 import './App.css';
 import CssBaseline from '@mui/material/CssBaseline';
-import PlayerContainer from '../src/components/PlayerContainer/PlayerContainer.tsx';
+import PlayerContainer from '../src/components/PlayerContainer/PlayerContainer';
 
 function App() {
   return (

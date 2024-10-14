@@ -1,8 +1,12 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import { selectIsPlayerFavorited } from '../../redux/selectors/userSelectors';
+
 import { Box } from '@mui/material';
 import './PlayerCardContainer.css';
 
-import PlayerCard from '../PlayerCard/PlayerCard.tsx';
+import PlayerCard from '../PlayerCard/PlayerCard';
 import Player from '../../types/Players';
 
 interface PlayerCardContainerProps {
@@ -11,31 +15,22 @@ interface PlayerCardContainerProps {
   onFavoriteClick: (player: Player) => void;
 }
 
-const PlayerCardContainer: React.FC<PlayerCardContainerProps> = ({
-  players,
-  favoritedPlayers,
-  onFavoriteClick,
-}) => {
+const PlayerCardContainer: React.FC<PlayerCardContainerProps> = ({ players, onFavoriteClick }) => {
+  const favoritedPlayers = useSelector((state: RootState) => state.user.favoritedPlayers);
+
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        maxHeight: '500px',
-        overflowY: 'scroll',
-        gap: 4,
-      }}
-    >
-      {players &&
-        players.map((player, index) => (
+    <Box>
+      {players.map((player, index) => {
+        const isFavorited = favoritedPlayers.some(favoritedPlayer => favoritedPlayer.id === player.id);
+        return (
           <PlayerCard
             key={index}
             player={player}
-            isFavorited={favoritedPlayers.includes(player)}
+            isFavorited={isFavorited}
             onFavoriteClick={onFavoriteClick}
           />
-        ))}
+        );
+      })}
     </Box>
   );
 };

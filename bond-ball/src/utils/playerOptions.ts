@@ -1,8 +1,8 @@
 const getPlayerOptions = (
-  playersPerPage,
-  page,
+  playersPerPage: number,
+  page: number,
   searchTerm = '',
-  cursor
+  cursor: number | null | undefined
 ) => {
   const params: {
     limit: number;
@@ -18,6 +18,6 @@ const getPlayerOptions = (
   return { params };
 };
 
-const getFavoritePlayerOptions = (user_id) => ({ params: { user_id: user_id } });
+const getFavoritePlayerOptions = (userId: number) => ({ params: { userId: userId } });
 
 export { getFavoritePlayerOptions, getPlayerOptions} ;

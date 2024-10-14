@@ -7,7 +7,7 @@ import Divider from '@mui/joy/Divider';
 import CardContent from '@mui/joy/CardOverflow';
 
 import Typography from '@mui/joy/Typography';
-import FavoriteIcon from '../FavoriteIcon.tsx';
+import FavoriteIcon from '../FavoriteIcon';
 
 interface PlayerCardProps {
   player: Player;

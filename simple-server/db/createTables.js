@@ -13,7 +13,7 @@ const createTables = async () => {
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-        
+
         await client.query('DROP TABLE IF EXISTS favorite_players CASCADE;');
         await client.query('DROP TABLE IF EXISTS users CASCADE;');
 
@@ -29,9 +29,9 @@ const createTables = async () => {
         await client.query(`
             CREATE TABLE IF NOT EXISTS favorite_players (
                 id SERIAL PRIMARY KEY,
-                player_id INT NOT NULL,
-                user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-                UNIQUE (player_id, user_id)
+                playerId INT NOT NULL,
+                userId INTEGER REFERENCES users(id) ON DELETE CASCADE,
+                UNIQUE (playerId, userId)
             );
         `);
 
