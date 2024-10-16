@@ -1,7 +1,7 @@
 import {
   addFavoritePlayer as addFavoritePlayerAPI,
   removeFavoritePlayer as removeFavoritePlayerAPI,
-} from '../services/playerService';
+} from '../services/userService';
 import Player from '../types/Players';
 
 const handleFavoritePlayer = (

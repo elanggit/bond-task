@@ -8,7 +8,10 @@ interface FavoriteIconProps {
   handleFavoriteClick: () => void;
 }
 
-const FavoriteIcon: React.FC<FavoriteIconProps> = ({ isFavorited, handleFavoriteClick }) => {
+const FavoriteIcon: React.FC<FavoriteIconProps> = ({
+  isFavorited,
+  handleFavoriteClick,
+}) => {
   const action_text = isFavorited ? 'remove' : 'add';
   const preposition = isFavorited ? 'from' : 'to';
   return (
@@ -20,6 +23,7 @@ const FavoriteIcon: React.FC<FavoriteIconProps> = ({ isFavorited, handleFavorite
       >
         <Box className="favorite-icon-container" onClick={handleFavoriteClick}>
           <StarTwoToneIcon
+            sx={{ color: isFavorited ? 'gold' : 'gray', border: 'black' }}
             className={`favorite-icon ${
               isFavorited ? 'favorited' : 'not-favorited'
             }`}

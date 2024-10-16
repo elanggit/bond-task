@@ -1,35 +1,19 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Card from '@mui/joy/Card';
 
 import Pagination from '@mui/material/Pagination';
 import './PlayerContainer.css';
-import { useFetch } from '../../hooks/useFetch';
 import NoFavoritePlayers from '../NoFavoritePlayers/NoFavoritePlayers';
-import Player from '../../types/Players';
 import PlayerCardContainer from '../PlayerCardContainer/PlayerCardContainer';
-import ErrorComponent from '../errors/ErrorComponent';
-import FavoritePlayersHeader from '../FavoritePlayerHeaders';
 import ResultsPerPage from '../ResultsPerPage/ResultsPerPage';
 import Input from '@mui/joy/Input';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { Box, Chip, FormControl } from '@mui/material';
-import {
-  getFavoritePlayerOptions,
-  getPlayerOptions,
-} from '../../utils/playerOptions';
-import { PaginationItem, SelectChangeEvent } from '@mui/material';
-import { PLAYER_API_HOST, FAVORITE_PLAYER_URL } from '../../constants/apiUrls';
-import {
-  addFavoritePlayer,
-  removeFavoritePlayer,
-} from '../../services/playerService.js';
-import handleFavoritePlayer from '../../utils/handleFavoritePlayer';
+import { Box, Chip, FormControl, Typography } from '@mui/material';
+import { SelectChangeEvent } from '@mui/material';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPlayers } from '../../redux/slices/playerSlice';
 import { fetchFavoritePlayers } from '../../redux/slices/userSlice';
-import { setFavoritePlayers } from '../../redux/slices/userSlice';
 import { RootState, AppDispatch } from '../../redux/store';
 const RESULTS_PER_PAGE = [5, 15, 25, 50, 100];
 
@@ -50,13 +34,6 @@ const PlayerContainer: React.FC = () => {
     dispatch(fetchFavoritePlayers({ userId: 1 }));
   }, [dispatch]);
 
-  const handlesetFavoritePlayers = async () => {
-    const resultAction = await dispatch(fetchFavoritePlayers({ userId: 1 }));
-    if (fetchFavoritePlayers.fulfilled.match(resultAction)) {
-      dispatch(setFavoritePlayers(resultAction.payload));
-    }
-  };
-
   if (status === 'loading') {
     return <div>Loading...</div>;
   }
@@ -76,6 +53,7 @@ const PlayerContainer: React.FC = () => {
   const handlePlayersPerPageChange = (event: SelectChangeEvent<number>) => {
     const playersPerPage = parseInt(event.target.value as string);
     setPlayersPerPage(playersPerPage);
+    setPage(1);
     dispatch(fetchPlayers({ playersPerPage: playersPerPage, page: 1 }));
   };
 
@@ -94,16 +72,6 @@ const PlayerContainer: React.FC = () => {
     }
   };
 
-  const handleAddRemovePlayer = async (player: Player) => {
-    const updatedFavoritedPlayers = await handleFavoritePlayer(
-      player,
-      favoritedPlayers,
-      1,
-      dispatch
-    );
-    setFavoritePlayers(updatedFavoritedPlayers);
-  };
-
   return (
     <>
       <Box
@@ -111,47 +79,74 @@ const PlayerContainer: React.FC = () => {
           width: '100%',
           height: '100%',
           display: 'flex',
-          flexDirection: 'row',
-          gridTemplateColumns:
-            'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
-          gap: 4,
+          overflow: 'wrap',
+          flexDirection: { xs: 'column', sm: 'row' },
         }}
       >
-        <Chip size="small" variant="outlined" color="default" label="Players" />
-        <FormControl>
-          <Input
-            placeholder="Search for players by first or last name"
-            size="sm"
-            variant="outlined"
-            onChange={handleCreateSearchTerm}
-            onKeyDown={handleKeyDown}
-          />
-        </FormControl>
-        <ResultsPerPage
-          playersPerPage={playersPerPage}
-          handlePlayersPerPageChange={handlePlayersPerPageChange}
-          options={RESULTS_PER_PAGE}
-        />
-        <Card sx={{ width: '75%', height: '70%' }} size="lg" variant="outlined">
-          <PlayerCardContainer
-            players={players}
-            favoritedPlayers={favoritedPlayers}
-            onFavoriteClick={handleAddRemovePlayer}
-          />
-          <Pagination
-            count={playersPerPage}
-            page={page}
-            onChange={handlePageChange}
-          />
-        </Card>
-        <Card sx={{ width: '20%', height: '70%' }} size="lg" variant="outlined">
-          <FavoritePlayersHeader />
-          {favoritedPlayers && favoritedPlayers.length > 0 ? (
-            <PlayerCardContainer
-              players={favoritedPlayers}
-              favoritedPlayers={favoritedPlayers}
-              onFavoriteClick={handlesetFavoritePlayers}
+        <Card sx={{ width: '50%' }} size="lg" variant="outlined">
+          <FormControl>
+            <Input
+              placeholder="Search for players by first or last name"
+              size="sm"
+              variant="outlined"
+              onChange={handleCreateSearchTerm}
+              onKeyDown={handleKeyDown}
             />
+          </FormControl>
+
+          <Typography
+            sx={{
+              fontSize: {
+                xs: '1.5rem',
+                sm: '2rem',
+                md: '2.5rem',
+                lg: '3rem',
+                xl: '3.75rem',
+              },
+            }}
+            variant="h2"
+            component="h2"
+            gutterBottom
+          >
+            Players
+          </Typography>
+
+          {players && players.length > 0 ? (
+            <PlayerCardContainer players={players} />
+          ) : (
+            <Typography>
+              {' '}
+              There are no results. Please note, you can only search by first or
+              last name.{' '}
+            </Typography>
+          )}
+          <ResultsPerPage
+            playersPerPage={playersPerPage}
+            handlePlayersPerPageChange={handlePlayersPerPageChange}
+            options={RESULTS_PER_PAGE}
+          />
+          <Pagination count={100} page={page} onChange={handlePageChange} />
+        </Card>
+        <Card sx={{ width: '50%' }} size="lg" variant="outlined">
+          <Typography
+            sx={{
+              fontSize: {
+                xs: '1.5rem',
+                sm: '2rem',
+                md: '2.5rem',
+                lg: '3rem',
+                xl: '3.75rem',
+              },
+            }}
+            variant="h2"
+            component="h2"
+            gutterBottom
+          >
+            Favorite Players
+          </Typography>
+
+          {favoritedPlayers && favoritedPlayers.length > 0 ? (
+            <PlayerCardContainer players={favoritedPlayers} />
           ) : (
             <NoFavoritePlayers />
           )}
