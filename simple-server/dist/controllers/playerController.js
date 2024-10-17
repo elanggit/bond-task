@@ -35,7 +35,9 @@ class PlayerController {
             const { page = 1, limit = 5, search = '', cursor = null, } = req.query;
             const cacheKey = `players_${page}_${limit}_${search}_${cursor}`;
             const cachedData = cache.get(cacheKey);
-            // if (cachedData) return res.status(200).json(cachedData);
+            if (cachedData)
+                return this.handleSuccess(res, cachedData, 'Players fetched successfully');
+            ;
             try {
                 const player_response = yield axios_1.default.get(ball_dont_lie_player_endpoint, {
                     headers: headers,
@@ -46,33 +48,8 @@ class PlayerController {
                     },
                 });
                 const data = formatPlayerData(player_response.data.data);
+                cache.set(cacheKey, data, 3600);
                 return this.handleSuccess(res, data, 'Players fetched successfully');
-            }
-            catch (error) {
-                return this.handleError(res, error);
-            }
-        });
-    }
-    handleSuccess(res, data, message) {
-        return res
-            .status(200)
-            .json({ data: data, message: message, status: 'success' });
-    }
-    updateFavoritePlayers(req, res, action) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!access_token)
-                return handleMissingToken(res);
-            const { userId, playerId } = req.body;
-            if (!userId || !playerId) {
-                return res.status(400).json({ message: 'Missing required fields' });
-            }
-            const user = new user_1.default(userId);
-            try {
-                const response = action === 'add'
-                    ? yield user.addFavoritePlayer(playerId)
-                    : yield user.removeFavoritePlayer(playerId);
-                const message = `Player ${action === 'add' ? 'added' : 'removed'} from favorites successfully`;
-                return this.handleSuccess(res, response, message);
             }
             catch (error) {
                 return this.handleError(res, error);
@@ -132,6 +109,32 @@ class PlayerController {
         if (error instanceof Error)
             return error.message;
         return String(error);
+    }
+    handleSuccess(res, data, message) {
+        return res
+            .status(200)
+            .json({ data: data, message: message, status: 'success' });
+    }
+    updateFavoritePlayers(req, res, action) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!access_token)
+                return handleMissingToken(res);
+            const { userId, playerId } = req.body;
+            if (!userId || !playerId) {
+                return res.status(400).json({ message: 'Missing required fields' });
+            }
+            const user = new user_1.default(userId);
+            try {
+                const response = action === 'add'
+                    ? yield user.addFavoritePlayer(playerId)
+                    : yield user.removeFavoritePlayer(playerId);
+                const message = `Player ${action === 'add' ? 'added' : 'removed'} from favorites successfully`;
+                return this.handleSuccess(res, response, message);
+            }
+            catch (error) {
+                return this.handleError(res, error);
+            }
+        });
     }
 }
 exports.PlayerController = PlayerController;

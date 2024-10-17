@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import Card from '@mui/joy/Card';
 
 import Pagination from '@mui/material/Pagination';
-import './PlayerContainer.css';
 import NoFavoritePlayers from '../NoFavoritePlayers/NoFavoritePlayers';
 import PlayerCardContainer from '../PlayerCardContainer/PlayerCardContainer';
 import ResultsPerPage from '../ResultsPerPage/ResultsPerPage';

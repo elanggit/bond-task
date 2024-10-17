@@ -12,7 +12,6 @@ dotenv.config();
 const ball_dont_lie_player_endpoint = 'https://api.balldontlie.io/v1/players';
 const access_token = process.env.ACCESS_TOKEN;
 
-// thirty minute cache. It is unlikely that the data will change in that time.
 const cache = new NodeCache({ stdTTL: 1800 });
 
 const headers = { Authorization: access_token };
@@ -42,8 +41,13 @@ export class PlayerController {
       cursor?: string | null;
     };
     const cacheKey = `players_${page}_${limit}_${search}_${cursor}`;
-    const cachedData = cache.get<PlayerResponse>(cacheKey);
-    // if (cachedData) return res.status(200).json(cachedData);
+    const cachedData = cache.get(cacheKey);
+    if (cachedData)
+      return this.handleSuccess(
+        res,
+        cachedData,
+        'Players fetched successfully'
+      );
     try {
       const player_response: AxiosResponse = await axios.get(
         ball_dont_lie_player_endpoint,
@@ -57,12 +61,67 @@ export class PlayerController {
         }
       );
       const data = formatPlayerData(player_response.data.data);
+      cache.set(cacheKey, data, 3600);
       return this.handleSuccess(res, data, 'Players fetched successfully');
     } catch (error: unknown) {
       return this.handleError(res, error);
     }
   }
 
+  public async addFavorite(req: Request, res: Response): Promise<Response> {
+    return this.updateFavoritePlayers(req, res, 'add');
+  }
+
+  public async removeFavorite(req: Request, res: Response): Promise<Response> {
+    return this.updateFavoritePlayers(req, res, 'remove');
+  }
+
+  public async getFavorites(req: Request, res: Response): Promise<Response> {
+    const { userId } = req.query as { userId?: number };
+    if (!userId) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+    const user = new User(userId);
+    try {
+      const playerIds = await user.getFavoritePlayerIds();
+      const playersFavorited = playerIds.length > 0;
+      if (!playersFavorited) {
+        return this.handleSuccess(res, [], 'No favorite players found');
+      }
+      const queryString = playerIds.map((id) => `player_ids[]=${id}`).join('&');
+      const url = `${ball_dont_lie_player_endpoint}?${queryString}`;
+      const response = await axios.get(url, { headers: headers });
+      const data = formatPlayerData(response.data.data);
+      return this.handleSuccess(
+        res,
+        data,
+        'Favorite players fetched successfully'
+      );
+    } catch (error) {
+      return this.handleError(res, error);
+    }
+  }
+
+  private handleError(res: Response, error: unknown): Response {
+    if (axios.isAxiosError(error)) {
+      return this.handleAxiosErrorResponse(res, error);
+    } else
+      return res.status(500).json({ message: this.getErrorMessage(error) });
+  }
+
+  private handleAxiosErrorResponse(res: Response, error: AxiosError): Response {
+    const status = error.response?.data || 500;
+    return res.status(status).json({
+      data: error.response?.data,
+      message: this.getErrorMessage(error),
+    });
+  }
+
+  private getErrorMessage(error: unknown) {
+    if (error instanceof Error) return error.message;
+
+    return String(error);
+  }
 
   private handleSuccess(res: Response, data: any, message: string): Response {
     return res
@@ -96,54 +155,5 @@ export class PlayerController {
     } catch (error: unknown) {
       return this.handleError(res, error);
     }
-  }
-
-  public async addFavorite(req: Request, res: Response): Promise<Response> {
-    return this.updateFavoritePlayers(req, res, 'add');
-  }
-
-  public async removeFavorite(req: Request, res: Response): Promise<Response> {
-    return this.updateFavoritePlayers(req, res, 'remove');
-  }
-
-  public async getFavorites(req: Request, res: Response): Promise<Response> {
-    const { userId } = req.query as { userId?: number };
-    if (!userId) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-    const user = new User(userId);
-    try {
-      const playerIds = await user.getFavoritePlayerIds();
-      const playersFavorited = playerIds.length > 0;
-      if (!playersFavorited) {
-        return this.handleSuccess(res, [], 'No favorite players found');
-      }
-      const queryString = playerIds.map((id) => `player_ids[]=${id}`).join('&');
-      const url = `${ball_dont_lie_player_endpoint}?${queryString}`;
-      const response = await axios.get(url, { headers: headers });
-      const data = formatPlayerData(response.data.data);
-      return this.handleSuccess(res, data, 'Favorite players fetched successfully');
-    } catch (error) {
-      return this.handleError(res, error);
-    }
-  }
-
-  private handleError(res: Response, error: unknown): Response {
-    if (axios.isAxiosError(error)) {
-      return this.handleAxiosErrorResponse(res, error);
-    } else
-      return res.status(500).json({ message: this.getErrorMessage(error) });
-  }
-  private handleAxiosErrorResponse(res: Response, error: AxiosError): Response {
-    const status = error.response?.data || 500;
-    return res.status(status).json({
-      data: error.response?.data,
-      message: this.getErrorMessage(error),
-    });
-  }
-
-  private getErrorMessage(error: unknown) {
-    if (error instanceof Error) return error.message;
-    return String(error);
   }
 }

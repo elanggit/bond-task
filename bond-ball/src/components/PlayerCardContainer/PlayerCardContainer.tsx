@@ -4,7 +4,6 @@ import { AppDispatch, RootState } from '../../redux/store';
 import { selectIsPlayerFavorited } from '../../redux/selectors/userSelectors';
 
 import { Box } from '@mui/material';
-import './PlayerCardContainer.css';
 
 import PlayerCard from '../PlayerCard/PlayerCard';
 import Player from '../../types/Players';
