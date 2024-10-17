@@ -1,7 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
-import { selectIsPlayerFavorited } from '../../redux/selectors/userSelectors';
 
 import { Box } from '@mui/material';
 
@@ -22,6 +21,7 @@ const PlayerCardContainer: React.FC<PlayerCardContainerProps> = ({
   const favoritedPlayers = useSelector(
     (state: RootState) => state.user.favoritedPlayers
   );
+  const user = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
 
   const onFavoriteClick = (player: Player) => {
@@ -29,9 +29,9 @@ const PlayerCardContainer: React.FC<PlayerCardContainerProps> = ({
       (favoritedPlayer) => favoritedPlayer.id === player.id
     );
     if (isFavorited) {
-      dispatch(removeFavoritePlayer({ userId: 1, player: player }));
+      dispatch(removeFavoritePlayer({ userId: user.id, player: player }));
     } else {
-      dispatch(addFavoritePlayer({ userId: 1, player: player }));
+      dispatch(addFavoritePlayer({ userId: user.id, player: player }));
     }
   };
 
@@ -39,11 +39,14 @@ const PlayerCardContainer: React.FC<PlayerCardContainerProps> = ({
     <Box
     sx={{
       width: { xs: 'auto', sm: '100%' },
+      height: '80%',
+      maxHeight: '100vh',
       maxWidth: '100%',
       display: 'flex',
       flexDirection: { xs: 'column', sm: 'row' },
       flexWrap: 'wrap',
-      gap: 4,
+      overflow: 'auto',
+      gap: 2,
       gridTemplateColumns: {
         xs: '1fr',
         sm: 'repeat(auto-fill, minmax(300px, 1fr))',

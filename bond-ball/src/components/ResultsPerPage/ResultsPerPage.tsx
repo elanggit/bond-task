@@ -29,6 +29,12 @@ const ResultsPerPage: React.FC<ResultsPerPageProps> = ({
         value={playersPerPage}
         onChange={handlePlayersPerPageChange}
         label="Results per page"
+        defaultValue={10}
+        sx={{
+          width: '100%', // Ensure the select box takes full width of the container
+          maxWidth: 200, // Set a maximum width for the select box
+        }}
+
       >
         {options.map((option) => (
           <MenuItem key={option} value={option}>

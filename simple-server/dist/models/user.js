@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const userService_1 = require("../services/userService");
+const errors_1 = require("../utils/errors");
 class User {
     constructor(id) {
         this.getFavoritePlayerIds = () => __awaiter(this, void 0, void 0, function* () {
@@ -19,12 +20,7 @@ class User {
                 return this.favoritePlayerIds;
             }
             catch (error) {
-                if (error instanceof Error) {
-                    throw new Error(`Failed to get favorite player: ${error.message}`);
-                }
-                else {
-                    throw new Error('Failed to get favorite player: Unknown error');
-                }
+                throw new Error((0, errors_1.errorMessage)(error));
             }
         });
         this.addFavoritePlayer = (playerId) => __awaiter(this, void 0, void 0, function* () {
@@ -41,12 +37,7 @@ class User {
                 }
             }
             catch (error) {
-                if (error instanceof Error) {
-                    throw new Error(`Failed to add favorite player: ${error.message}`);
-                }
-                else {
-                    throw new Error('Failed to add favorite player: Unknown error');
-                }
+                throw new Error((0, errors_1.errorMessage)(error));
             }
         });
         this.removeFavoritePlayer = (playerId) => __awaiter(this, void 0, void 0, function* () {
@@ -56,12 +47,7 @@ class User {
                 return reponse;
             }
             catch (error) {
-                if (error instanceof Error) {
-                    throw new Error(`Failed to remove favorite player: ${error.message}`);
-                }
-                else {
-                    throw new Error('Failed to remove favorite player: Unknown error');
-                }
+                throw new Error((0, errors_1.errorMessage)(error));
             }
         });
         this.id = id;

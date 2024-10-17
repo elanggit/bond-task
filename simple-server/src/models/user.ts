@@ -38,7 +38,7 @@ class User {
         return response;
       }
     } catch (error) {
-      throw new Error(errorMessage(error)
+      throw new Error(errorMessage(error))
     }
   };
 

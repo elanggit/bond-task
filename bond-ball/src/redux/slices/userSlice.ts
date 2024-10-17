@@ -7,7 +7,7 @@ import {
 import Player from '../../types/Players';
 
 interface UserState {
-  id: number | null;
+  id: number ;
   favoritedPlayers: Player[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   next_cursor: number | null;
@@ -16,7 +16,8 @@ interface UserState {
 }
 
 const initialState: UserState = {
-  id: null,
+  // This is hardcoded for now, but should be determined via auth
+  id: 1,
   favoritedPlayers: [],
   status: 'idle',
   error: null,
@@ -52,6 +53,7 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
+    // This should be determined via auth, but for the sake of this example, we'll hardcode it
     setUserId(state, action: PayloadAction<number>) {
       state.id = 1;
     },

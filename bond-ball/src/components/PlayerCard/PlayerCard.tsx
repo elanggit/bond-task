@@ -40,16 +40,16 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
       <CardActions
         sx={{
           display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' }, // Column on extra-small screens, row on small screens and above
+          flexDirection: { xs: 'column', sm: 'row' }, 
           alignItems: 'center',
           justifyContent: 'space-between',
           width: '100%',
-          gap: { xs: 1, sm: 2 }, // Adjust gap between elements based on screen size
+          gap: { xs: 1, sm: 2 }, 
         }}
       >
         <Typography level="title-lg" sx={{ 
            mr: { xs: 0, sm: 'auto' }, 
-           fontSize: { s: '1rem',lg: '1.2rem', xl: '1.5rem' }, // Responsive font sizes
+           fontSize: { s: '8px',lg: '12px', xl: '15px' }, 
           }}>
           {first_name} {last_name}
         </Typography>

@@ -17,27 +17,28 @@ const axios_1 = __importDefault(require("axios"));
 const user_1 = __importDefault(require("../models/user"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const node_cache_1 = __importDefault(require("node-cache"));
+const errors_1 = require("../utils/errors");
 const { formatPlayerData } = require('../services/playerService');
 dotenv_1.default.config();
 const ball_dont_lie_player_endpoint = 'https://api.balldontlie.io/v1/players';
 const access_token = process.env.ACCESS_TOKEN;
-// thirty minute cache. It is unlikely that the data will change in that time.
 const cache = new node_cache_1.default({ stdTTL: 1800 });
 const headers = { Authorization: access_token };
-const handleMissingToken = (res) => {
-    return res.status(500).send('No authorization token found');
-};
 class PlayerController {
+    constructor() {
+        this.handleMissingToken = (res) => {
+            return res.status(500).send('No authorization token found');
+        };
+    }
     getPlayers(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!access_token)
-                return handleMissingToken(res);
+                return this.handleMissingToken(res);
             const { page = 1, limit = 5, search = '', cursor = null, } = req.query;
             const cacheKey = `players_${page}_${limit}_${search}_${cursor}`;
             const cachedData = cache.get(cacheKey);
             if (cachedData)
                 return this.handleSuccess(res, cachedData, 'Players fetched successfully');
-            ;
             try {
                 const player_response = yield axios_1.default.get(ball_dont_lie_player_endpoint, {
                     headers: headers,
@@ -95,20 +96,15 @@ class PlayerController {
             return this.handleAxiosErrorResponse(res, error);
         }
         else
-            return res.status(500).json({ message: this.getErrorMessage(error) });
+            return res.status(500).json({ message: (0, errors_1.errorMessage)(error) });
     }
     handleAxiosErrorResponse(res, error) {
         var _a, _b;
         const status = ((_a = error.response) === null || _a === void 0 ? void 0 : _a.data) || 500;
         return res.status(status).json({
             data: (_b = error.response) === null || _b === void 0 ? void 0 : _b.data,
-            message: this.getErrorMessage(error),
+            message: (0, errors_1.errorMessage)(error),
         });
-    }
-    getErrorMessage(error) {
-        if (error instanceof Error)
-            return error.message;
-        return String(error);
     }
     handleSuccess(res, data, message) {
         return res
@@ -118,7 +114,7 @@ class PlayerController {
     updateFavoritePlayers(req, res, action) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!access_token)
-                return handleMissingToken(res);
+                return this.handleMissingToken(res);
             const { userId, playerId } = req.body;
             if (!userId || !playerId) {
                 return res.status(400).json({ message: 'Missing required fields' });

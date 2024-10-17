@@ -7,13 +7,14 @@ import NoFavoritePlayers from '../NoFavoritePlayers/NoFavoritePlayers';
 import PlayerCardContainer from '../PlayerCardContainer/PlayerCardContainer';
 import ResultsPerPage from '../ResultsPerPage/ResultsPerPage';
 import Input from '@mui/joy/Input';
-import { Box, Chip, FormControl, Typography } from '@mui/material';
+import { Box, FormControl, Typography } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPlayers } from '../../redux/slices/playerSlice';
 import { fetchFavoritePlayers } from '../../redux/slices/userSlice';
 import { RootState, AppDispatch } from '../../redux/store';
+import ErrorComponent from '../errors/ErrorComponent';
 const RESULTS_PER_PAGE = [5, 15, 25, 50, 100];
 
 const PlayerContainer: React.FC = () => {
@@ -27,10 +28,11 @@ const PlayerContainer: React.FC = () => {
   const [page, setPage] = useState(1);
   const [playersPerPage, setPlayersPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState('');
+  const user = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     dispatch(fetchPlayers({ playersPerPage: 5, page: 1 }));
-    dispatch(fetchFavoritePlayers({ userId: 1 }));
+    dispatch(fetchFavoritePlayers({ userId: user.id }));
   }, [dispatch]);
 
   if (status === 'loading') {
@@ -38,7 +40,7 @@ const PlayerContainer: React.FC = () => {
   }
 
   if (status === 'failed') {
-    return <div>Error loading players</div>;
+    return <ErrorComponent message={''}/>
   }
 
   const handlePageChange = (
@@ -75,10 +77,13 @@ const PlayerContainer: React.FC = () => {
     <>
       <Box
         sx={{
+          maxWidth: '100vw',
+          maxHeight: '100vh',
           width: '100%',
           height: '100%',
           display: 'flex',
-          overflow: 'wrap',
+          flexWrap: 'wrap',
+          overflow: 'auto',
           flexDirection: { xs: 'column', sm: 'row' },
         }}
       >
@@ -94,15 +99,6 @@ const PlayerContainer: React.FC = () => {
           </FormControl>
 
           <Typography
-            sx={{
-              fontSize: {
-                xs: '1.5rem',
-                sm: '2rem',
-                md: '2.5rem',
-                lg: '3rem',
-                xl: '3.75rem',
-              },
-            }}
             variant="h2"
             component="h2"
             gutterBottom
