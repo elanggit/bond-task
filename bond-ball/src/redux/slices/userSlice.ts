@@ -16,7 +16,7 @@ interface UserState {
 }
 
 const initialState: UserState = {
-  // This is hardcoded for now, but should be determined via auth
+  // This is hardcoded for now, but should be determined via authentication
   id: 1,
   favoritedPlayers: [],
   status: 'idle',
