@@ -1,7 +1,8 @@
-# bond-task
+## bond-task
+An app for displaying and favoriting nba players.
 
 
-Dependencies:
+### Dependencies:
 - Node.js
 - PostgreSQL
 
