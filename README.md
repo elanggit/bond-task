@@ -6,7 +6,7 @@ An app for displaying and favoriting nba players.
 - Node.js
 - PostgreSQL
 
-##Setup
+### Setup
 
 ### Install Node.js and PostgreSQL
 Ensure you have Node.js and PostgreSQL installed on your machine. You can download them from the following links:
