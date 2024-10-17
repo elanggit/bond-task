@@ -1,7 +1,5 @@
 import {
   PLAYER_API_HOST,
-  ADD_FAVORITE_PLAYER_URL,
-  REMOVE_FAVORITE_PLAYER_URL,
 } from '../constants/apiUrls';
 
 import axios from 'axios';

@@ -39,7 +39,7 @@ const PlayerCardContainer: React.FC<PlayerCardContainerProps> = ({
     <Box
     sx={{
       width: { xs: 'auto', sm: '100%' },
-      height: '80%',
+      // height: '80%',
       maxHeight: '100vh',
       maxWidth: '100%',
       display: 'flex',

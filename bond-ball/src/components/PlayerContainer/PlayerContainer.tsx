@@ -102,6 +102,15 @@ const PlayerContainer: React.FC = () => {
             variant="h2"
             component="h2"
             gutterBottom
+            sx={{
+              fontSize: {
+                xs: '1rem',
+                sm: '1.5rem',
+                md: '2rem',
+                lg: '2.5rem',
+                xl: '3rem',
+              },
+            }}
           >
             Players
           </Typography>
@@ -126,11 +135,11 @@ const PlayerContainer: React.FC = () => {
           <Typography
             sx={{
               fontSize: {
-                xs: '1.5rem',
-                sm: '2rem',
-                md: '2.5rem',
-                lg: '3rem',
-                xl: '3.75rem',
+                xs: '1rem',
+                sm: '1.5rem',
+                md: '2rem',
+                lg: '2.5rem',
+                xl: '3rem',
               },
             }}
             variant="h2"

@@ -5,7 +5,9 @@
   "main": "index.tsx",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dist/server.js"
+    "start": "ts-node dist/server.ts",
+    "create-tables": "ts-node src/db/createTables.ts",
+    "seed": "ts-node src/db/seed.ts"
   },
   "keywords": [],
   "author": "",

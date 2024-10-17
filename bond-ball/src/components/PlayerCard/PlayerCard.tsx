@@ -31,7 +31,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
       sx={{
         width: { xs: '100%', sm: '350px' },
         height: { xs: 'auto', sm: '280px' },
-        padding: { xs: '16px', sm: '20px' },
+        padding: { xs: '20px', sm: '20px' },
       }}
       size="lg"
       variant="outlined"
@@ -49,7 +49,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
       >
         <Typography level="title-lg" sx={{ 
            mr: { xs: 0, sm: 'auto' }, 
-           fontSize: { s: '8px',lg: '12px', xl: '15px' }, 
+           fontSize: { xs:'14px', s: '16px',lg: '18px', xl: '20px' }, 
           }}>
           {first_name} {last_name}
         </Typography>
