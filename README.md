@@ -1,5 +1,10 @@
 ## bond-task
-An app for displaying and favoriting nba players.
+An app for displaying and favoriting NBA players. 
+
+Note: This app does not currently have authentication and is just a demo. Therefore, all of the data is for a mock user (1). 
+
+Link to schema designs: https://excalidraw.com/#json=u1N1enNwUttdgWLQW611i,TsRZuaswJ12YAGYUFflt0w
+
 
 
 ### Dependencies:
