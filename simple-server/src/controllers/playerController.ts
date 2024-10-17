@@ -2,8 +2,8 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import User from '../models/user';
 import dotenv from 'dotenv';
 import NodeCache from 'node-cache';
+import { errorMessage } from '../utils/errors';
 import { Response, Request } from 'express';
-import Player from '../models/player';
 
 const { formatPlayerData } = require('../services/playerService');
 
@@ -16,19 +16,9 @@ const cache = new NodeCache({ stdTTL: 1800 });
 
 const headers = { Authorization: access_token };
 
-const handleMissingToken = (res: Response): Response => {
-  return res.status(500).send('No authorization token found');
-};
-
-interface PlayerResponse {
-  players: Player[];
-  next_cursor: string | null;
-  prev_cursor: string | null;
-}
-
 export class PlayerController {
   public async getPlayers(req: Request, res: Response): Promise<Response> {
-    if (!access_token) return handleMissingToken(res);
+    if (!access_token) return this.handleMissingToken(res);
     const {
       page = 1,
       limit = 5,
@@ -106,21 +96,15 @@ export class PlayerController {
     if (axios.isAxiosError(error)) {
       return this.handleAxiosErrorResponse(res, error);
     } else
-      return res.status(500).json({ message: this.getErrorMessage(error) });
+      return res.status(500).json({ message: errorMessage(error) });
   }
 
   private handleAxiosErrorResponse(res: Response, error: AxiosError): Response {
     const status = error.response?.data || 500;
     return res.status(status).json({
       data: error.response?.data,
-      message: this.getErrorMessage(error),
+      message: errorMessage(error),
     });
-  }
-
-  private getErrorMessage(error: unknown) {
-    if (error instanceof Error) return error.message;
-
-    return String(error);
   }
 
   private handleSuccess(res: Response, data: any, message: string): Response {
@@ -134,7 +118,7 @@ export class PlayerController {
     res: Response,
     action: string
   ): Promise<Response> {
-    if (!access_token) return handleMissingToken(res);
+    if (!access_token) return this.handleMissingToken(res);
     const { userId, playerId } = req.body as {
       userId: number;
       playerId: number;
@@ -156,4 +140,9 @@ export class PlayerController {
       return this.handleError(res, error);
     }
   }
+
+  private handleMissingToken = (res: Response): Response => {
+    return res.status(500).send('No authorization token found');
+  };
+  
 }

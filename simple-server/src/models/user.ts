@@ -3,6 +3,7 @@ import {
   addFavoritePlayer as addFavoritePlayerAPI,
   removeFavoritePlayer as removeFavoritePlayerAPI,
 } from '../services/userService';
+import { errorMessage } from '../utils/errors';
 
 class User {
   id: number;
@@ -19,11 +20,7 @@ class User {
       this.favoritePlayerIds = favorite_playerIds;
       return this.favoritePlayerIds;
     } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(`Failed to get favorite player: ${error.message}`);
-      } else {
-        throw new Error('Failed to get favorite player: Unknown error');
-      }
+      throw new Error(errorMessage(error))
     }
   };
 
@@ -41,11 +38,7 @@ class User {
         return response;
       }
     } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(`Failed to add favorite player: ${error.message}`);
-      } else {
-        throw new Error('Failed to add favorite player: Unknown error');
-      }
+      throw new Error(errorMessage(error)
     }
   };
 
@@ -57,11 +50,7 @@ class User {
       const reponse = await removeFavoritePlayerAPI(this.id, playerId);
       return reponse;
     } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(`Failed to remove favorite player: ${error.message}`);
-      } else {
-        throw new Error('Failed to remove favorite player: Unknown error');
-      }
+      throw new Error(errorMessage(error))
     }
   };
 }
