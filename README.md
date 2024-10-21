@@ -5,6 +5,8 @@ Note: This app does not currently have authentication and is just a demo. Theref
 
 Link to schema designs: https://excalidraw.com/#json=u1N1enNwUttdgWLQW611i,TsRZuaswJ12YAGYUFflt0w
 
+Link to technical overview: https://docs.google.com/document/d/1YTcnmTOWEprIXfh_6H-p63QbqIgdTWgJksaONxe4e_k/edit?tab=t.0
+
 
 
 ### Dependencies:
